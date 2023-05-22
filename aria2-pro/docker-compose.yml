@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+
+  Aria2-Pro:
+    container_name: aria2-pro
+    image: p3terx/aria2-pro
+    restart: always
+    environment:
+      - PUID=65534
+      - PGID=65534
+      - UMASK_SET=022
+      - RPC_PORT=6800
+      - LISTEN_PORT=6888
+      - DISK_CACHE=64M
+      - IPV6_MODE=false
+      - UPDATE_TRACKERS=true
+      - CUSTOM_TRACKER_URL=https://trackerslist.com/all.txt
+      - TZ=Asia/Shanghai
+      - SPECIAL_MODE=rclone
+    volumes:
+      - ${PWD}/aria2-config:/config
+      - ${PWD}/aria2-downloads:/downloads
+    ports:
+      - 16800:6800
+      - 16888:6888
+      - 16888:6888/udp
+    networks:
+      - aria-network
+
+  alwebdav:
+    image: messense/aliyundrive-webdav:1.8
+    container_name: alwebdav
+    restart: unless-stopped
+    ports:
+      - 5215:8080
+    environment:
+      - REFRESH_TOKEN=
+      - WEBDAV_AUTH_USER=admin
+      - WEBDAV_AUTH_PASSWORD=singlelovely
+    volumes:
+      - ${PWD}/aliyundrive-webdav/:/etc/aliyundrive-webdav/
+    networks:
+      - aria-network
+
+    
+networks:
+  aria-network:
+    driver: bridge
